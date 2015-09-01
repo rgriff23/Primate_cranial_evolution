@@ -2,19 +2,28 @@
 
 [Randi H. Griffin]()
 
+* The methods used in this project draw heavily upon the R package `geomorph` (Adams and Otarola-Castillo 2013).
+
 ___
 
 ## Introduction
 
-The past few years have witnessed the development of many sophisticated statistical methods that combine geometric morphometrics with phylogenetic comparative methods. In addition, recently developed R packages have made these methods readily accessible to evolutionary biologists. These methods allow researchers to test numerous macroevolutionary hypotheses that cannot be addressed with traditional geometric morphometrics or univarite phylogenetic comparative methods. 
-
+The past few years have witnessed the development of many sophisticated statistical methods that combine geometric morphometrics with phylogenetic comparative methods. In addition, recently developed R packages have made these methods readily accessible to evolutionary biologists. These methods allow researchers to avoid spurious results due to failure to account for the phylogenetic structure of their data (Díaz-Uriarte and Garland 1996; Uyeda et al., 2015), and more excitingly, to test numerous macroevolutionary hypotheses that cannot be addressed with traditional geometric morphometrics or univarite phylogenetic comparative methods (Klingenberg and Marugan-Lobon 2013). 
 This document summarizes the analyses and results I've obtained from applying phylogenetic geometric morphometric methods (PGMMs) to a comparative dataset on primate cranial shape from Fleagle et al. (2010). By analyzing this data in a phylogenetic context, I hope to yield insights into the ecological and evolutionary factors underlying variation in primate cranial shape. This investigation is divided into three chapters:
 
-1. Effects of allometry and sexual dimorphism on primate cranial shape
+1. Effects of allometry and sexual dimorphism on primate cranial shape evolution
 2. Ecomorphology of primate cranial shape
 3. Modularity, integration, and rates of primate cranial shape evolution
 
-The same landmark data and phylogeny are used in all three chapters. The primate cranial shape dataset includes 18 landmarks for a male and female specimen from a representative species of each primate genus. The phylogeny is a consensus tree from 10kTrees (Arnold et al. 2010). The only changes I made to the data involved editing taxa labels so that they match between the data and the phylogeny, and I dropped two taxa from the landmark data because they were not present in the phylogeny. Landmarks were aligned using generalized procrustes alignment prior to all analyses, and centroid sizes were recorded for all crania. 
+The same landmark data and phylogeny are used in all three chapters. The primate cranial shape dataset includes 18 landmarks for a male and female specimen from a representative species from most primate genera. Since some species only had one of the sexes sampled, this results in datasets of slightly different sizes (*n* = 64 males, *n* = 61 females). The phylogeny is a consensus tree from 10kTrees (Arnold et al. 2010). The only changes I made to the data involved editing taxa labels so that they match between the data and the phylogeny, and dropping two taxa from the landmark data because they were not present in the phylogeny. Landmarks were aligned using generalized procrustes alignment prior to all analyses, and centroid sizes were recorded for all crania. Here is a view of the species and phylogeny:
+
+![](./figures/SpeciesTree.tiff)
+
+Before doing any phylogenetic analyses of shape, I tested for significant phylogenetic signal using two methods. First, I used a multivariate extension of a well-known univariate measure of phylogenetic signal, Blomberg's K (Adams 2014). Second, I used an approach developed by Klingenberg and Gidaszewski (2010), which uses squared-change parsimony as a test statistic to compare the observed data to a null distribution obtained by permuting data at the tips of the tree. Both methods revealed strong phylogenetic signal in the data (*p* < 0.001), indicating that it is appropriate to analyze this data in a phylogenetic framework. We can visualize the phylogenetic structure of our shape data by projecting the phylogeny and ancestral state reconstructions into tangent space. This is akin to plotting datapoints in the space defined by the first two PC axes, except this plot also depicts the phylogenetic relationships among datapoints and the locations of ancestral states in shape space. 
+
+![](./figures/Phylomorphospace.tiff)
+
+Alright, now that the cranial shape data is ready to go and I have confirmed that the data is phylogenetically structured, its time to ask some more interesting questions. 
 
 ## CHAPTER 1: Effects of allometry and sexual dimorphism on primate cranial shape
 
@@ -39,8 +48,20 @@ This project demonstrates the broad scope of macroevolutionary questions that ca
 
 ## References
 
-- Arnold C, Matthews LJ, Nunn CL. The 10kTrees Website: a new online resource for primate phylogeny, v3. Evol Anthropol. 2010;19: 114–118.
+- Adams DC. 2014. A generalized K statistic for estimating phylogenetic signal from shape and other high-dimensional multivariate data. Syst Biol 63:685-697.
 
-- Fleagle, J.G., Gilbert, C.C., and A.L. Baden. 2010. Primate cranial diversity. Am. J. Phys. Anth. 142:565-578.
+- Adams DC, Otarola-Castillo E. 2013. geomorph: an R package for the collection and analysis of geometric morphometric shape data. Meth Ecol Evol 4:393-399.
+
+- Arnold C, Matthews LJ, Nunn CL. 2010. The 10kTrees Website: a new online resource for primate phylogeny, v3. Evol Anthropol 19: 114–118.
+
+- Díaz-Uriarte R, Garland T. 1996. Testing hypotheses of correlated evolution using phylogenetically independent contrasts: sensitivity to deviations from Brownian Motion. Syst Biol 45(1):27-47.
+
+- Fleagle JG, Gilbert CC, Baden AL. 2010. Primate cranial diversity. Am J Phys Anth 142:565-578.
+
+- Klingenberg CP, Gidaszewski NA. 2010. Testing and quantifying phylogenetic signals and homoplasy in morphometric data. Syst Biol 59:245-261.
+
+- Klingenberg CP, Marugan-Lobon J. 2013. Evolutionary covariation in geometric morphometric data: analyzing integration, modularity, and allometry in a phylogenetic context. Syst Biol 62(4):591-610.
+
+- Uyeda JC, Caetano DS, Pennell MW. 2015. Comparative analyses of principal components can be misleading. Syst Biol 64(4):677-89.
 
 ___
