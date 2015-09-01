@@ -6,3 +6,5 @@
 *.Rhistory
 *.Rapp.history
 
+# ignore cranial data
+CranialData.csv
