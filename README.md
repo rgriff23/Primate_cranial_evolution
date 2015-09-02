@@ -14,7 +14,7 @@ The landmark data come from a study published in 2010 by J.G. Fleagle, C.C. Gilb
 
 `BodyMass.csv` contains male and female body mass estimates from Smith and Jungers (1994). 
 
-`EcologyData2.csv` and`EcologyData3.csv` contain character states for activity pattern, diet, and locomotion style for the primates in our analysis. The two datasets code activity pattern and locomotion styles as 2 and 3 state characters, respectively. These data were obtained from the following public databases:
+`EcologyData2.csv` and`EcologyData3.csv` contain character states for activity pattern, diet, and locomotion style for the primates in our analysis. The two datasets code activity pattern and locomotion styles as 2 and 3 state characters, respectively. These data were obtained from the following online resources: [IUCN](www.iucnredlist.org), [Primate Info Net](www.pin.primate.wisc.edu), and [Animal Diversity Web](www.animaldiversity.org).
 
 ### Analysis
 
