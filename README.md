@@ -2,7 +2,7 @@
 
 [Randi H. Griffin]()
 
-This repository contains the R code for my ongoing dissertation work. 
+This repository contains the R code for part of my ongoing dissertation work. 
 
 ___
 
@@ -32,5 +32,7 @@ The folder **figures** contains the figures that are included in `Synopsis.md`.
 
 - Fleagle, J.G., Gilbert, C.C., and A.L. Baden. 2010. Primate cranial diversity. Am. J. Phys.
 Anth. 142:565-578.
+
+- Smith, R.J., and W.L. Jungers. 1997. Body mass in comparative primatology. J Hum Evol 32(6):523-559.
 
 ___

@@ -10,6 +10,9 @@ library(ape)
 library(geiger)
 library(plyr)
 
+# Set seed since some significance tests are based on permutations
+set.seed(922015)
+
 ###############################################################################################
 # Preparations
 ###############################################################################################
@@ -17,9 +20,9 @@ library(plyr)
 # Read data
 landmarks = read.csv("./data/CranialData.csv", header=TRUE, stringsAsFactors=FALSE)
 tree = read.nexus("./data/PrimateTree.nex")
-ecology2 = read.csv("./data/EcologyData_2state.csv", header=TRUE, stringsAsFactors=FALSE)
-ecology3 = read.csv("./data/EcologyData_3state.csv", header=TRUE, stringsAsFactors=FALSE)
-bodymass = read.csv("./data/BodyMass.csv", header=TRUE, stringsAsFactors=FALSE)
+ecology2 = read.csv("./data/EcologyData_2state.csv", header=TRUE, stringsAsFactors=FALSE, row.names=1)
+ecology3 = read.csv("./data/EcologyData_3state.csv", header=TRUE, stringsAsFactors=FALSE, row.names=1)
+bodymass = read.csv("./data/BodyMass.csv", header=TRUE, stringsAsFactors=FALSE, row.names=1)
 
 # Subset landmarks and phylogeny into males and females
 landmarks.m = landmarks[which(landmarks$sex=="M"),]		
@@ -100,7 +103,54 @@ plotGMPhyloMorphoSpace(tree.f, coords.f, plot.param=list(t.cex=0.3, n.cex=0.3, l
 mtext("Females", line=1)
 
 ###############################################################################################
-# Allometry and sexual dimorphism
+# Allometry of cranial shape
+###############################################################################################
+
+# Run regressions of shape vs size
+allometry.m = procD.pgls(coords.m ~ log(csize.m), tree.m)
+allometry.f = procD.pgls(coords.f ~ log(csize.f), tree.f)
+
+###############################################################################################
+# Ecomorphology of cranial shape
+###############################################################################################
+
+# Prepare male ecology data
+ecology2.m = ecology2[names(csize.m),]
+activity2.m = setNames(ecology2.m$activity, rownames(ecology2.m))
+diet2.m = setNames(ecology2.m$diet, rownames(ecology2.m))
+locomotion2.m = setNames(ecology2.m$locomotion, rownames(ecology2.m))
+
+# Prepare female ecology data
+ecology2.f = ecology2[names(csize.f),]
+activity2.f = setNames(ecology2.f$activity, rownames(ecology2.f))
+diet2.f = setNames(ecology2.f$diet, rownames(ecology2.f))
+locomotion2.f = setNames(ecology2.f$locomotion, rownames(ecology2.f))
+
+# Plot ecology data
+quartz()
+layout(matrix(1:3,1,3))
+par(mar=c(1,1,1,2))
+act_col = c("orange", "black")
+diet_col = c("hotpink", "purple", "blue")
+loc_col = c("saddlebrown", "green4")
+plot(tree, tip.color=act_col[ecology2$activity][match(tree$tip.label, rownames(ecology2))], cex=0.7, label.offset=0.5)
+legend("bottomleft", legend=c("Diurnal/Cathemeral", "Nocturnal"), fill=act_col, cex=0.7)
+plot(tree, tip.color=diet_col[ecology2$diet][match(tree$tip.label, rownames(ecology2))], cex=0.7, label.offset=0.5)
+legend("bottomleft", legend=c("Frugivore", "Omnivore", "Insectivore/Folivore"), fill=diet_col, cex=0.7)
+plot(tree, tip.color=loc_col[ecology2$locomotion][match(tree$tip.label, rownames(ecology2))], cex=0.7, label.offset=0.5)
+legend("bottomleft", legend=c("Pronograde", "Orthograde"), fill=loc_col, cex=0.7)
+par(mar=c(5,4,4,2)+0.1)
+
+# Run regressions of shape vs ecology
+ecomorph.m = procD.pgls(coords.m ~ activity2.m + diet2.m + locomotion2.m + log(csize.m), tree.m, RRPP=TRUE)
+ecomorph.f = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(csize.f), tree.f, RRPP=TRUE)
+
+# Run regressions of shape vs ecology with Pagel's lambda = 0
+ecomorph.m0 = procD.pgls(coords.m ~ activity2.m + diet2.m + locomotion2.m + log(csize.m), rescale(tree.m, "lambda", 0), RRPP=TRUE)
+ecomorph.f0 = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(csize.f), rescale(tree.f, "lambda", 0), RRPP=TRUE)
+
+###############################################################################################
+# Sexual dimorphism and cranial shape
 ###############################################################################################
 
 

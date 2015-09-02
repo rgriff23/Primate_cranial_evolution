@@ -9,26 +9,57 @@ ___
 ## Introduction
 
 The past few years have witnessed the development of many sophisticated statistical methods that combine geometric morphometrics with phylogenetic comparative methods. In addition, recently developed R packages have made these methods readily accessible to evolutionary biologists. These methods allow researchers to avoid spurious results due to failure to account for the phylogenetic structure of their data (Díaz-Uriarte and Garland 1996; Uyeda et al., 2015), and more excitingly, to test numerous macroevolutionary hypotheses that cannot be addressed with traditional geometric morphometrics or univarite phylogenetic comparative methods (Klingenberg and Marugan-Lobon 2013). 
-This document summarizes the analyses and results I've obtained from applying phylogenetic geometric morphometric methods (PGMMs) to a comparative dataset on primate cranial shape from Fleagle et al. (2010). By analyzing this data in a phylogenetic context, I hope to yield insights into the major  ecological and evolutionary factors underlying broad patterns of variation in primate cranial shape. This investigation is divided into two parts:
+
+This document summarizes the analyses and results I've obtained from applying phylogenetic geometric morphometric methods to a comparative dataset on primate cranial shape from Fleagle et al. (2010). By analyzing this data in a phylogenetic context, I hope to yield insights into the major ecological and evolutionary factors underlying broad patterns of variation in primate cranial shape. This investigation is divided into two parts:
 
 1. Effects of allometry, ecology, and sexual dimorphism on primate cranial shape evolution
 2. Modularity, integration, and rates of primate cranial shape evolution
 
 The same landmark data and phylogeny are used in all three chapters. The primate cranial shape dataset includes 18 landmarks for a male and female specimen from a representative species from most primate genera. Since some species only had one of the sexes sampled, sample sizes were slightly different for males and females (*n* = 64 males, *n* = 61 females). The phylogeny is a consensus tree from 10kTrees (Arnold et al. 2010). The only changes I made to the data involved editing taxa labels so that they match between the data and the phylogeny, and dropping two taxa from the landmark data because they were not present in the phylogeny. Landmarks were aligned using generalized procrustes alignment prior to all analyses, and centroid sizes were recorded for all crania. Here is a view of the species and phylogeny:
 
-![](./figures/SpeciesTree.tiff)
+![](./figures/SpeciesTree.png)
 
 Before doing any phylogenetic analyses of shape, I tested for significant phylogenetic signal using two methods. First, I used a multivariate extension of a well-known univariate measure of phylogenetic signal, Blomberg's K (Adams 2014). Second, I used an approach developed by Klingenberg and Gidaszewski (2010), which uses squared-change parsimony as a test statistic to compare the observed data to a null distribution obtained by permuting data at the tips of the tree. Both methods revealed strong phylogenetic signal in the data (*p* < 0.001), indicating that it is appropriate to analyze this data in a phylogenetic framework. We can visualize the phylogenetic structure of our shape data by projecting the phylogeny and ancestral state reconstructions into tangent space. 
 
-![](./figures/Phylomorphospace.tiff)
+![](./figures/Phylomorphospace.png)
 
-This is a traditional PCA plot (and shows the same patterns reported in Fleagle et al., 2010), except it also depicts the phylogenetic relationships among datapoints and the locations of ancestral states in shape space. The positions of ancestral states are based on squared-change parsimony reconstructions of landmark coordinates. The first PCA largely separates strepsirrhines and haplorhines, while the second PCA largely separates platyrrhines and catarrhines. There appears to be greater interspecific morphological disparity among males than females. Several genera stand out as outliers, including *Homo*, *Alouatta*, *Varecia*, *Avahi*, and *Tarsius*. Several highly sexually dimorphic genera, *Gorilla*, *Pongo*, and *Mandrillus*, are outliers for males, but cluster with Cercopithecoidea in females. One genus, *Saimiri* stands out among females, but not among males.
+This is a traditional PCA plot (and shows the same patterns reported in Fleagle et al., 2010), except it depicts the phylogenetic relationships among datapoints and the locations of ancestral states in shape space. The positions of ancestral states are based on squared-change parsimony reconstructions of landmark coordinates. The first PCA largely separates strepsirrhines and haplorhines, while the second PCA largely separates platyrrhines and catarrhines. There appears to be greater interspecific morphological disparity among males than females. Several genera stand out as outliers, including *Homo*, *Alouatta*, *Varecia*, *Avahi*, and *Tarsius*. Several highly sexually dimorphic genera, *Gorilla*, *Pongo*, and *Mandrillus*, are outliers for males but cluster with Cercopithecoidea in females. One genus, *Saimiri* stands out among females, but not among males.
 
 ## PART 1: Effects of allometry, ecology, and sexual selection on primate cranial shape
 
-Several major factors are expected to influence the evolution of primate cranial shape. Allometry is expected to affect the relative sizes, positions, and orientation of various parts of the skull (Ross 1995; Frost et al., 2003; Fleagle et al., 2010). Ecology is expected to influence cranial shape by selecting for morphologies adapted to the activity pattern, diet, and locomotor habits of each species (Baab et al., 2014; Fleagle et al., 2010). Finally, sexual selection is thought to be an important driver of morphological evolution, leading to sexual dimorphism in both cranial shape and size (Plavcan 2001). In this part of the study, I use multivariate phylogenetic regression to test for associations between cranial shape and size, ecology, and sexual selection.
+Several major factors are expected to influence the evolution of primate cranial shape. Allometry is expected to affect the relative sizes, positions, and orientations of various parts of the skull (Ross 1995; Frost et al., 2003; Fleagle et al., 2010). Ecology is also expected to influence cranial shape by selecting for morphologies adapted to the activity pattern, diet, and locomotor habits of each species (Fleagle et al., 2010; Baab et al., 2014). Finally, sexual selection may be an important driver of morphological evolution, leading to sexual dimorphism in both cranial shape and size (Plavcan 2001). In this part of the study, I use multivariate phylogenetic regression to test for associations between cranial shape and size, ecology, and sexual selection.
 
-In geometric morphometrics, allometry is most frequently characterized by regressing shape (a multidimensional array of 2D or 3D landmark coordinates) against size (typically measured as the log-transformed centroid sizes of the same shape data). Given a phylogeny and landmark data for the species at the tips, phylogenetic multivariate regression can be used to characterize evolutionary allometry. 
+### Allometry of cranial shape
+
+In geometric morphometrics, allometry is most frequently characterized by regressing shape (a multidimensional array of 2D or 3D landmark coordinates) against size (typically measured as the log-transformed centroid sizes of the same shape data). Given a phylogeny and landmark data for the species at the tips, phylogenetic multivariate regression can be used to characterize evolutionary allometry. Using this approach, I find that centroid size explains 11% of variation in cranial shape for males and 7% for females. This is similar in magnitude to a recent study on the evolutionary allometry of cranial shape in birds, which found that centroid size explained 13% of variation in cranial shape across 160 bird species (Klingenberg and Marugán-Lobón 2013). The nature of the effect of allometry on shape can be assessed qualitatively by inspecting wireframe diagrams for predicted landmark coordinates for small and large species:
+
+[Need to figure out how to extract predicted values from model]
+
+Results indicate...
+
+### Ecomorphology of cranial shape
+
+One major advantage of the broad taxonomic sampling in this dataset is that there is plenty of ecological variation, allowing us to test for associations between ecological traits and cranial shape. For instance, activity pattern and diet are likely to influence primate cranial shape through adaptations to the visual and masticatory systems, while the style of locomotion is expected to influence the morphology of the cranial base. I compiled categorical data on activity pattern, diet, and locomotion style for the species in this study using a variety of online resources: [IUCN](www.iucnredlist.org), [Primate Info Net](www.pin.primate.wisc.edu), and [Animal Diversity Web](www.animaldiversity.org).
+
+For activity pattern, I coded species into three categories: 1 = diurnal/cathemeral and 2 = nocturnal. The major adaptation to nocturnal life expected to be reflected in our measures of cranial shape is relatively enlarged orbits to accomodate larger eyeballs.
+
+For diet, I coded species into three categories meant to capture the degree to which the mascitory system should be adapted for mechanical advantage to facilitate powerful chewing: 1 = primarily frugivorous, 2 = mixture of frugivorous and folivorous/insectivorous, and 3 = primarily folivorous or insectivorous. This is an admittedly crude categorization that ignores much variation in diet, but statistical inference would be impossible with more complex categorization systems for such a small data set. 
+
+For locomotion style, I coded species into three categories that capture the degree to which pronograde or orthograde postures are adopted during locomotion: 1 = primarily pronograde and 2 = primarily orthograde. Species exhibiting frequent orthograde locomotion fall into three major categories: vertical clinging and leaping, brachiation, and bipedalism. Although these are very different modes of locomotion, I assumed that the common feature of orthograde posture will have similar effects on the morphology of the cranial base, particularly in the relative location of the foramen magnum. 
+
+Here is a figure depicting the ecology data:
+
+![](./figures/EcologyData.png)
+
+I fit phylogenetic multivariate regression models for both males and females, including activity pattern, diet, locomotion style, and log-transformed centroid size as predictors. Results revealed that none of the ecological variables were significant predictors of cranial shape in either males or females, although activity pattern was close to significant in females (*p* = 0.055). Although this runs counter to our intuition based on a qualitative survey of primate crania and ecological categories, it does not necessarily count as strong evidence against the ecological hypotheses being tested. It could be that the ecological variables drive evolutionary changes in cranial shape, but we do not have sufficient statistical power to detect these associations. In support of this interpretation, associations between ecology and cranial shape are stronger when phylogeny is ignored: activity pattern becomes highly significant in both males and females (*p* < 0.001) and explains about 21-23% of variation in cranial shape, while locomotion style becomes significant in males (*p* < 0.05) and about 3% of variation in cranial shape. Diet remains non-significant for both males and females.  
+
+A similar result was obtained by Baab et al. (2014), who found that controlling for phylogeny eliminated significant relationships between ecological variables and cranial shape in lemurs. I emphasize again that this does not imply that ecology does not influence the evolution of cranial shape. Cranial shape evolution has almost certainly been influenced by ecology, but we may lack statistical power to detect relationships if major evolutionary shifts in ecology and morphology have occurred only a few times across the phylogeny. Expanding the analysis to include non-primate mammals would be one way to increase statistical power to detect relationships between ecological categories and cranial shape, as this would add additional evolutionary transitions among ecological categories. Another way to increase statistical power, particularly for diet and locomotion, would be to use a continuous measurement that captures species tendencies more precisely than the crude categorical variables used here.
+
+In addition to low statistical power, the lack of strong support for a relationship between diet or locomotion and cranial shape could also reflect inadequacies in the coding scheme adopted or inadequacies in the landmarks included in the study. Activity pattern is more straightforward on both counts, as it is relatively clear cut whether a species is nocturnal or not, and the major cranial adapation for nocturnal life is large orbits, which the landmarks in this study capture well. On the other hand, diet and locomotion style are more varied and less discrete than activity pattern, and the morphological adaptations expected for diet and locomotion style may not be captured as easily by the landmarks in this study. Dietary adaptations may be largely reflected in tooth and mandible morphology, both of which are absent in the landmark data. On the other hand, adaptations for different locomotion styles may be largely reflected in the morphology of the cranial base, which is notoriously difficult to measure with intact specimens (Fleagle et al., 2010). 
+
+### Sexual selection and cranial shape
+
+[COMING SOON!]
 
 ## PART 2: Modularity, integration, and rates of primate cranial shape evolution
 
@@ -36,8 +67,7 @@ Modularity and integration are closely related concepts that describe patterns o
 
 The vast majority of research on cranial modularity and integration has focused on variation within populations or species (Klingenberg 2013). However, modularity and integration can also be studied on a macroevolutionary scale (Klingenberg & Marugán-Lobón 2013). At this scale, patterns of modularity and integration are influenced by a combination of genetic, developmental, functional, and evolutionary factors. Previous studies have found that overall patterns of cranial modularity are remarkably consistent across primates (bunch of studies, cited in Ackerman 2009) and even across mammals (Goswami 2006; Marroig et al., 2009; Porto et al., 2009). This stability is likely due in part to genetic and developmental constraints, and in part due to stabilizing selection. On the other hand, while *patterns* of modularity are largely stable across taxa, the *magnitude* of integration across modules can vary considerably (e.g., Claverie & Patek, 2013), and it has been hypothesized that variation in the strength of integration can influence morphological evolution on a macroevolutionary scale (Olson & Miller, 1958). For instance, it has been hypothesized that modularity will tend to increase through evolutionary time as natural selection favors the relaxation of constraints that integration places on morphological diversification (Marcot & McShea, 2007; Porto et al., 2009). Another hypothesis is that greater modularity facilitates higher rates of evolutionary change, because different modules can respond independently to different selection pressures, while greater integration results in slower evolutionary rates (Goswami & Polly, 2010; Claverie & Patek, 2013; Goswami et al., 2015). 
 
-
-
+[COMING SOON!]
 
 ## Conclusions
 
@@ -66,6 +96,8 @@ This project demonstrates the broad scope of macroevolutionary questions that ca
 - Plavcan JM. 2001. Sexual dimorphism in primate evolution. Yearbook Phys Anthro 44:25-53.
 
 - Ross CF. 1995. Allometric and functional influences on primate orbit orientation and the origins of the Anthropoidea. J Hum Evol 29(3):201-227.
+
+- Smith RJ, Jungers WL. 1997. Body mass in comparative primatology. J Hum Evol 32(6):523-559.
 
 - Uyeda JC, Caetano DS, Pennell MW. 2015. Comparative analyses of principal components can be misleading. Syst Biol 64(4):677-89.
 
