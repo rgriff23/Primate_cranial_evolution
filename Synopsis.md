@@ -15,7 +15,11 @@ This document summarizes the analyses and results I've obtained from applying ph
 1. Effects of allometry, ecology, and sexual dimorphism on primate cranial shape evolution
 2. Modularity, integration, and rates of primate cranial shape evolution
 
-The same landmark data and phylogeny are used in all three chapters. The primate cranial shape dataset includes 18 landmarks for a male and female specimen from a representative species from most primate genera. Since some species only had one of the sexes sampled, sample sizes were slightly different for males and females (*n* = 64 males, *n* = 61 females). The phylogeny is a consensus tree from 10kTrees (Arnold et al. 2010). The only changes I made to the data involved editing taxa labels so that they match between the data and the phylogeny, and dropping two taxa from the landmark data because they were not present in the phylogeny. Landmarks were aligned using generalized procrustes alignment prior to all analyses, and centroid sizes were recorded for all crania. Here is a view of the species and phylogeny:
+The same landmark data and phylogeny are used in all three chapters. The primate cranial shape dataset includes 18 landmarks for a male and female specimen from a representative species from most primate genera. Since some species only had one of the sexes sampled, sample sizes were slightly different for males and females (*n* = 64 males, *n* = 61 females). Here is a figure depicting the landmarks, taken directly from Fleagle et al. (2010).
+
+![](./figures/Landmarks.png)
+
+The phylogeny is a consensus tree from 10kTrees (Arnold et al. 2010). The only changes I made to the data involved editing taxa labels so that they match between the data and the phylogeny, and dropping two taxa from the landmark data because they were not present in the phylogeny. Landmarks were aligned using generalized procrustes alignment prior to all analyses, and centroid sizes were recorded for all crania. Here is a view of the species and phylogeny:
 
 ![](./figures/SpeciesTree.png)
 
