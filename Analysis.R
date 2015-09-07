@@ -8,6 +8,7 @@ if (.Platform$OS.type=="windows") {quartz<-function() windows()}
 library(geomorph)
 library(ape)
 library(geiger)
+library(caper)
 library(plyr)
 
 # Set seed since some significance tests are based on permutations
@@ -153,8 +154,84 @@ ecomorph.f0 = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(
 # Sexual dimorphism and cranial shape
 ###############################################################################################
 
+# Prepare sexual dimorphism data
+dimorphism.m = bodymass[names(csize.m),]
+dimorphism.m = setNames(log(dimorphism.m$male_bodymass) - log(dimorphism.m$female_bodymass), names(csize.m))
+dimorphism.f = bodymass[names(csize.f),]
+dimorphism.f = setNames(log(dimorphism.f$male_bodymass) - log(dimorphism.f$female_bodymass), names(csize.f))
 
+# Variance inflation factors for body mass and sexual dimorphism
+compdat.m = comparative.data(tree.m, data.frame(dimorphism.m, csize.m, species=names(csize.m)), species)
+compdat.f = comparative.data(tree.f, data.frame(dimorphism.f, csize.f, species=names(csize.f)), species)
+lm.bm.sd.m = pgls(dimorphism.m ~ log(csize.m), compdat.m)
+lm.bm.sd.f = pgls(dimorphism.f ~ log(csize.f), compdat.f)
+vif.bm.sd.m = 1/(1 - summary(lm.bm.sd.m)$adj.r.squared)
+vif.bm.sd.f = 1/(1 - summary(lm.bm.sd.f)$adj.r.squared)
+sqrt(vif.bm.sd.m)
+sqrt(vif.bm.sd.f)
 
+# Run regressions of shape vs. dimorphism
+sexselect.m = procD.pgls(coords.m ~ dimorphism.m + log(csize.m), tree.m, RRPP=TRUE)
+sexselect.f = procD.pgls(coords.f ~ dimorphism.f + log(csize.f), tree.f, RRPP=TRUE)
+
+###############################################################################################
+# Sexual dimorphism and rates of cranial shape evolution
+###############################################################################################
+
+# Compute dimorphism PIC ancestral states
+dimorphism.m.ace = ace(dimorphism.m, tree.m, method="pic")$ace
+dimorphism.f.ace = ace(dimorphism.f, tree.f, method="pic")$ace
+
+# Compute centroid size PICs
+csize.pic.m = pic(log(csize.m), tree.m)
+csize.pic.f = pic(log(csize.f), tree.f)
+
+# Compute sum of shape PICs
+mat.m = matrix(coords.m, dim(coords.m)[3], prod(dim(coords.m)[1:2]), byrow=TRUE, dimnames=list(dimnames(coords.m)[[3]]))
+mat.f = matrix(coords.f, dim(coords.f)[3], prod(dim(coords.f)[1:2]), byrow=TRUE, dimnames=list(dimnames(coords.f)[[3]]))
+shape.pic.m = c()
+shape.pic.f = c()
+for (i in 1:ncol(mat.m)) {
+  shape.pic.m = cbind(shape.pic.m, pic(mat.m[,i], tree.m))
+  shape.pic.f = cbind(shape.pic.f, pic(mat.f[,i], tree.f))
+  
+}
+sum.pic.m = rowSums(abs(shape.pic.m))
+sum.pic.f = rowSums(abs(shape.pic.f))
+
+# Regress shape disparity vs. dimorphism and centroid size
+dimorphism.lm.m = lm(log(sum.pic.m) ~ dimorphism.m.ace + csize.pic.m)
+dimorphism.lm.f = lm(log(sum.pic.f) ~ dimorphism.f.ace + csize.pic.f)
+summary(dimorphism.lm.m)$coef
+summary(dimorphism.lm.f)$coef
+
+# Visualize results with scatterplots
+quartz()
+layout(matrix(1:2, 1, 2))
+pch.m = c(rep(1, 44), rep(3, 19))
+pch.f = c(rep(1, 43), rep(3, 17))
+plot(log(sum.pic.m) ~ dimorphism.m.ace, ylab="Cranial shape disparity", xlab="Sexual size dimorphism", main="Males", pch=pch.m)
+abline(a=summary(dimorphism.lm.m)$coef[1,"Estimate"], b=summary(dimorphism.lm.m)$coef[2,"Estimate"])
+par(xpd=TRUE)
+legend("topleft", inset=c(-0.25, -0.25), legend=c("Haplorhines", "Strepsirrhines"), pch=c(1,3), cex=0.6)
+par(xpd=FALSE)
+plot(log(sum.pic.f) ~ dimorphism.f.ace, ylab="", xlab="Sexual size dimorphism", main="Females", pch=pch.f)
+abline(a=summary(dimorphism.lm.f)$coef[1,"Estimate"], b=summary(dimorphism.lm.f)$coef[2,"Estimate"])
+
+# Visualize magnitude of cranial shape changes across phylogeny based on PIC
+quartz()
+layout(matrix(1:2,1,2))
+par(mar=c(0,0,2,0))
+plot(tree.m, cex=0.5)
+nodelabels(pch=22, cex=sum.pic.m*4, col="blue")
+mtext("Males")
+plot(tree.f, cex=0.5)
+nodelabels(pch=22, cex=sum.pic.f*4, col="red", bg="pink")
+mtext("Females")
+
+###############################################################################################
+# Modularity, integration, and rates of cranial shape evolution
+###############################################################################################
 
 
 
