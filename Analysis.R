@@ -111,6 +111,9 @@ mtext("Females", line=1)
 allometry.m = procD.pgls(coords.m ~ log(csize.m), tree.m)
 allometry.f = procD.pgls(coords.f ~ log(csize.f), tree.f)
 
+# Wireframes for allometry for males and females
+
+
 ###############################################################################################
 # Ecomorphology of cranial shape
 ###############################################################################################
@@ -150,6 +153,8 @@ ecomorph.f = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(c
 ecomorph.m0 = procD.pgls(coords.m ~ activity2.m + diet2.m + locomotion2.m + log(csize.m), rescale(tree.m, "lambda", 0), RRPP=TRUE)
 ecomorph.f0 = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(csize.f), rescale(tree.f, "lambda", 0), RRPP=TRUE)
 
+# Wireframes for nocturnality
+
 ###############################################################################################
 # Sexual dimorphism and cranial shape
 ###############################################################################################
@@ -174,8 +179,10 @@ sqrt(vif.bm.sd.f)
 sexselect.m = procD.pgls(coords.m ~ dimorphism.m + log(csize.m), tree.m, RRPP=TRUE)
 sexselect.f = procD.pgls(coords.f ~ dimorphism.f + log(csize.f), tree.f, RRPP=TRUE)
 
+# Wireframes of dimorphism for males and females
+
 ###############################################################################################
-# Sexual dimorphism and rates of cranial shape evolution
+# Sexual dimorphism and cranial shape divergence
 ###############################################################################################
 
 # Compute dimorphism PIC ancestral states
@@ -210,7 +217,7 @@ quartz()
 layout(matrix(1:2, 1, 2))
 pch.m = c(rep(1, 44), rep(3, 19))
 pch.f = c(rep(1, 43), rep(3, 17))
-plot(log(sum.pic.m) ~ dimorphism.m.ace, ylab="Cranial shape disparity", xlab="Sexual size dimorphism", main="Males", pch=pch.m)
+plot(log(sum.pic.m) ~ dimorphism.m.ace, ylab="Cranial shape divergence", xlab="Sexual size dimorphism", main="Males", pch=pch.m)
 abline(a=summary(dimorphism.lm.m)$coef[1,"Estimate"], b=summary(dimorphism.lm.m)$coef[2,"Estimate"])
 par(xpd=TRUE)
 legend("topleft", inset=c(-0.25, -0.25), legend=c("Haplorhines", "Strepsirrhines"), pch=c(1,3), cex=0.6)
