@@ -37,9 +37,9 @@ Several major factors are expected to influence the evolution of primate cranial
 
 In geometric morphometrics, allometry is most frequently characterized by regressing shape (a multidimensional array of 2D or 3D landmark coordinates) against size (typically measured as the log-transformed centroid sizes of the same shape data). Given a phylogeny and landmark data for the species at the tips, phylogenetic multivariate regression can be used to characterize evolutionary allometry. Using this approach, I find that centroid size explains 11% of variation in cranial shape for males and 7% for females. This is similar in magnitude to a recent study on the evolutionary allometry of cranial shape in birds, which found that centroid size explained 13% of variation in cranial shape across 160 bird species (Klingenberg and Marugán-Lobón 2013). The nature of the effect of allometry on shape can be assessed qualitatively by inspecting wireframe diagrams for predicted landmark coordinates for small and large species:
 
-**[Need to figure out how to extract predicted values from model]**
+![](./figures/AllometryWireframes.png)
 
-Results indicate...
+The wireframes indicate that larger species tend to have an elongated snout and braincase, relatively smaller orbits, and increased cranial flexion.
 
 ### Ecomorphology of cranial shape
 
@@ -77,11 +77,11 @@ To investigate the effects of agonistic competition on patterns of cranial shape
 
 Results indicate that sexual dimorphism in body mass is positively associated with evolutionary divergence in cranial shape in both males (*R^2* = 0.15; *p* < 0.001) and females (*R^2* = 0.08; *p* < 0.05), while log centroid size is non-significant (*p* > 0.05). The relationship between evolutionary divergence in cranial shape and sexual dimorphism can be visualized with scatterplots (note that cranial shape divergence is on a log scale): 
 
-![](./figures/DisparityDimorphismScatter.png)
+![](./figures/DivergenceDimorphismScatter.png)
 
 By plotting separate data points for strepsirrhines and haplorhines, it becomes apparent that this result is driven by patterns of variation among haplorhine primates, since strepsirrhines show little variation in sexual dimorphism. To gain a more nuanced view of where the largest changes in cranial shape may have occurred across the primate phylogeny, we can visualize the primate phylogeny with the size of each node label proportional to the divergence in cranial shape between its immediate descendants, as estimated by independent contrasts. 
 
-![](./figures/DisparityPhylogeny.png)
+![](./figures/DivergencePhylogeny.png)
 
 The largest divergences in cranial shape appear to have occurred among the most sexually dimorphic genera in the apes and papionins. 
 

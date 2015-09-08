@@ -112,7 +112,27 @@ allometry.m = procD.pgls(coords.m ~ log(csize.m), tree.m)
 allometry.f = procD.pgls(coords.f ~ log(csize.f), tree.f)
 
 # Wireframes for allometry for males and females
+source("ProcD.pgls2.R")
+allometry.m2 = procD.pgls2(coords.m ~ log(csize.m), tree.m)
+x = data.frame(c(log(csize.m["Microcebus_murinus"]), log(csize.m["Gorilla_gorilla"])))
+names(x) = "x.newlog(csize.m)"
+test = predict(allometry.m2$model)
 
+csize.model.m = coefficients(allometry.m2$model)
+min.csize.m = log(csize.m[which.min(csize.m)])
+max.csize.m = log(csize.m[which.max(csize.m)])
+pred.max.csize.m <- pred.min.csize.m <- c()
+for (i in 1:ncol(csize.model.m)) {
+  pred.max.csize.m[i] = csize.model.m[1,i] + max.csize.m*csize.model.m[2,i]
+  pred.min.csize.m[i] = csize.model.m[1,i] + min.csize.m*csize.model.m[2,i]
+}
+a = c(1,1,1,2,2,3,13,13,15,16,17,18,4,6,5,4,6,8,8,14,3,9,9,8,10)
+b = c(2,12,7,4,3,13,14,15,16,17,18,12,6,5,7,7,8,3,11,11,11,11,7,10,12)
+skull = matrix(c(a,b), 25, 2)
+array.max.csize.m = array(pred.max.csize.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")), links=skull)
+array.min.csize.m = array(pred.min.csize.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")), links=skull)
+plotAllSpecimens(array.max.csize.m)
+plotAllSpecimens(array.min.csize.m)
 
 ###############################################################################################
 # Ecomorphology of cranial shape
