@@ -9,5 +9,6 @@
 # ignore cranial data
 CranialData.csv
 
-# ignore original wireframes
-figures/original_wireframes
+# ignore wireframe originals and params
+figures/wireframe_originals
+figures/wireframe_params

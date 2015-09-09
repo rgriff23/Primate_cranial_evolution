@@ -11,6 +11,23 @@ library(geiger)
 library(caper)
 library(plyr)
 
+# Load functions
+source("ProcD.pgls2.R")
+source("plotWireframe.R")
+
+# Define links for wireframe diagrams
+a = c(1,1,1,2,2,3,13,13,15,16,17,18,4,6,5,4,6,8,8,14,3,9,9,8,10,3,6,6,5)
+b = c(2,12,7,4,3,13,14,15,16,17,18,12,6,5,7,7,8,3,11,11,11,11,7,10,12,2,3,7,4)
+skull = matrix(c(a,b), length(a), 2)
+
+# Set parameters for wireframe diagrams
+#pp <- par3d(no.readonly=TRUE)
+#dput(pp, file="dimorphismParamsF.R", control = "all")
+pam = dget("allometryParamsM.R")
+paf = dget("allometryParamsF.R")
+pdm = dget("dimorphismParamsM.R")
+pdf = dget("dimorphismParamsF.R")
+
 # Set seed since some significance tests are based on permutations
 set.seed(922015)
 
@@ -112,12 +129,8 @@ allometry.m = procD.pgls(coords.m ~ log(csize.m), tree.m)
 allometry.f = procD.pgls(coords.f ~ log(csize.f), tree.f)
 
 # Wireframes for allometry for males and females
-source("ProcD.pgls2.R")
+# males
 allometry.m2 = procD.pgls2(coords.m ~ log(csize.m), tree.m)
-x = data.frame(c(log(csize.m["Microcebus_murinus"]), log(csize.m["Gorilla_gorilla"])))
-names(x) = "x.newlog(csize.m)"
-test = predict(allometry.m2$model)
-
 csize.model.m = coefficients(allometry.m2$model)
 min.csize.m = log(csize.m[which.min(csize.m)])
 max.csize.m = log(csize.m[which.max(csize.m)])
@@ -126,13 +139,24 @@ for (i in 1:ncol(csize.model.m)) {
   pred.max.csize.m[i] = csize.model.m[1,i] + max.csize.m*csize.model.m[2,i]
   pred.min.csize.m[i] = csize.model.m[1,i] + min.csize.m*csize.model.m[2,i]
 }
-a = c(1,1,1,2,2,3,13,13,15,16,17,18,4,6,5,4,6,8,8,14,3,9,9,8,10)
-b = c(2,12,7,4,3,13,14,15,16,17,18,12,6,5,7,7,8,3,11,11,11,11,7,10,12)
-skull = matrix(c(a,b), 25, 2)
-array.max.csize.m = array(pred.max.csize.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")), links=skull)
-array.min.csize.m = array(pred.min.csize.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")), links=skull)
-plotAllSpecimens(array.max.csize.m)
-plotAllSpecimens(array.min.csize.m)
+array.max.csize.m = array(pred.max.csize.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+array.min.csize.m = array(pred.min.csize.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+plotWireframe(array.max.csize.m, skull, params=pam)
+plotWireframe(array.min.csize.m, skull, params=pam)
+# females
+allometry.f2 = procD.pgls2(coords.f ~ log(csize.f), tree.f)
+csize.model.f = coefficients(allometry.f2$model)
+min.csize.f = log(csize.f[which.min(csize.f)])
+max.csize.f = log(csize.f[which.max(csize.f)])
+pred.max.csize.f <- pred.min.csize.f <- c()
+for (i in 1:ncol(csize.model.f)) {
+  pred.max.csize.f[i] = csize.model.f[1,i] + max.csize.f*csize.model.f[2,i]
+  pred.min.csize.f[i] = csize.model.f[1,i] + min.csize.f*csize.model.f[2,i]
+}
+array.max.csize.f = array(pred.max.csize.f, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+array.min.csize.f = array(pred.min.csize.f, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+plotWireframe(array.max.csize.f, skull, params=paf)
+plotWireframe(array.min.csize.f, skull, params=paf)
 
 ###############################################################################################
 # Ecomorphology of cranial shape
@@ -173,8 +197,6 @@ ecomorph.f = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(c
 ecomorph.m0 = procD.pgls(coords.m ~ activity2.m + diet2.m + locomotion2.m + log(csize.m), rescale(tree.m, "lambda", 0), RRPP=TRUE)
 ecomorph.f0 = procD.pgls(coords.f ~ activity2.f + diet2.f + locomotion2.f + log(csize.f), rescale(tree.f, "lambda", 0), RRPP=TRUE)
 
-# Wireframes for nocturnality
-
 ###############################################################################################
 # Sexual dimorphism and cranial shape
 ###############################################################################################
@@ -200,6 +222,34 @@ sexselect.m = procD.pgls(coords.m ~ dimorphism.m + log(csize.m), tree.m, RRPP=TR
 sexselect.f = procD.pgls(coords.f ~ dimorphism.f + log(csize.f), tree.f, RRPP=TRUE)
 
 # Wireframes of dimorphism for males and females
+# males
+sexselect.m2 = procD.pgls2(coords.m ~ dimorphism.m + log(csize.m), tree.m)
+dimorph.model.m = coefficients(sexselect.m2$model)
+min.dimorph.m = dimorphism.m[which.min(dimorphism.m)]
+max.dimorph.m = dimorphism.m[which.max(dimorphism.m)]
+pred.max.dimorph.m <- pred.min.dimorph.m <- c()
+for (i in 1:ncol(dimorph.model.m)) {
+  pred.max.dimorph.m[i] = dimorph.model.m[1,i] + max.dimorph.m*dimorph.model.m[2,i] + mean(log(csize.m))*dimorph.model.m[3,i]
+  pred.min.dimorph.m[i] = dimorph.model.m[1,i] + min.dimorph.m*dimorph.model.m[2,i] + mean(log(csize.m))*dimorph.model.m[3,i]
+}
+array.max.dimorph.m = array(pred.max.dimorph.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+array.min.dimorph.m = array(pred.min.dimorph.m, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+plotWireframe(array.max.dimorph.m, skull, params=pdm)
+plotWireframe(array.min.dimorph.m, skull, params=pdm)
+# females
+sexselect.f2 = procD.pgls2(coords.f ~ dimorphism.f + log(csize.f), tree.f)
+dimorph.model.f = coefficients(sexselect.f2$model)
+min.dimorph.f = dimorphism.f[which.min(dimorphism.f)]
+max.dimorph.f = dimorphism.f[which.max(dimorphism.f)]
+pred.max.dimorph.f <- pred.min.dimorph.f <- c()
+for (i in 1:ncol(dimorph.model.f)) {
+  pred.max.dimorph.f[i] = dimorph.model.f[1,i] + max.dimorph.f*dimorph.model.f[2,i] + mean(log(csize.f))*dimorph.model.f[3,i]
+  pred.min.dimorph.f[i] = dimorph.model.f[1,i] + min.dimorph.f*dimorph.model.f[2,i] + mean(log(csize.f))*dimorph.model.f[3,i]
+}
+array.max.dimorph.f = array(pred.max.dimorph.f, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+array.min.dimorph.f = array(pred.min.dimorph.f, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+plotWireframe(array.max.dimorph.f, skull, params=pdf)
+plotWireframe(array.min.dimorph.f, skull, params=pdf)
 
 ###############################################################################################
 # Sexual dimorphism and cranial shape divergence
@@ -240,7 +290,7 @@ pch.f = c(rep(1, 43), rep(3, 17))
 plot(log(sum.pic.m) ~ dimorphism.m.ace, ylab="Cranial shape divergence", xlab="Sexual size dimorphism", main="Males", pch=pch.m)
 abline(a=summary(dimorphism.lm.m)$coef[1,"Estimate"], b=summary(dimorphism.lm.m)$coef[2,"Estimate"])
 par(xpd=TRUE)
-legend("topleft", inset=c(-0.25, -0.25), legend=c("Haplorhines", "Strepsirrhines"), pch=c(1,3), cex=0.6)
+legend("topleft", inset=c(-0.2, -0.2), legend=c("Haplorhines", "Strepsirrhines"), pch=c(1,3), cex=0.6)
 par(xpd=FALSE)
 plot(log(sum.pic.f) ~ dimorphism.f.ace, ylab="", xlab="Sexual size dimorphism", main="Females", pch=pch.f)
 abline(a=summary(dimorphism.lm.f)$coef[1,"Estimate"], b=summary(dimorphism.lm.f)$coef[2,"Estimate"])
@@ -259,8 +309,6 @@ mtext("Females")
 ###############################################################################################
 # Modularity, integration, and rates of cranial shape evolution
 ###############################################################################################
-
-
 
 
 
