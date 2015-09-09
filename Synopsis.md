@@ -39,7 +39,7 @@ In geometric morphometrics, allometry is most frequently characterized by regres
 
 ![](./figures/AllometryWireframes.png)
 
-The wireframes indicate that larger species tend to have an elongated snout and braincase, relatively smaller orbits, and increased cranial flexion.
+The wireframes support observations from previous research on the allometry of cranial shape in primates. The strongest patterns are that larger species tend to have relatively smaller orbits, longer snouts, and increased basicranial flexion. The relatively smaller orbits are expected due to negative allometry between eye size and cranial or body size (Ross 1995). In addition, this pattern may be exaggerated by the fact that most nocturnal primates are small-bodied while the largest primates are diurnal, and nocturnal primates have larger eyeballs than diurnal primates as an adaptation to low-light environments (Ross 1995). The elongated snout is also expected, as many studies in different groups of primates have found that jaw length shows positive allometry [why?] (e.g., Gould 1975; Hylander 1985; Singleton 2002; Taylor 2002). Finally, the positive allometry of basicranial flexion has been previously noted, and may be driven by increasing brain size in larger primates (Ross and Ravosa 1993).
 
 ### Ecomorphology of cranial shape
 
@@ -115,7 +115,11 @@ This project demonstrates the broad scope of macroevolutionary questions that ca
 
 - Frost SR, Marcus LF, Bookstein FL, Reddy DP, Delson E. 2003. Cranial allometry, phylogeography, and systematics of large-bodied papionins (primates: Cercopithecinae) inferred from geometric morphometric analysis of landmark data. Anat Rec Part A: Disc Mol Cel Evo Biol 275A(2):1048-1072.
 
+- Gould SJ. 1975. On the scaling of tooth size in mammals. Am Zool 15(2):353-362.
+
 - Harrison PW, Wright AE, Zimmer F, Dean R, Montgomery SH, Pointer MA, Mank JE. 2015. Sexual selection drives evolution and rapid turnover of male gene expression. PNAS 112(14):4393-4398.
+
+- Hylander WL. 1985. Mandibular function and biomechanical stress and scaling. Amer Zool 25(2):315-330.
 
 - Klingenberg CP, Gidaszewski NA. 2010. Testing and quantifying phylogenetic signals and homoplasy in morphometric data. Syst Biol 59:245-261.
 
@@ -125,7 +129,13 @@ This project demonstrates the broad scope of macroevolutionary questions that ca
 
 - Ross CF. 1995. Allometric and functional influences on primate orbit orientation and the origins of the Anthropoidea. J Hum Evol 29(3):201-227.
 
+- Ross CF, Ravosa MJ. 1993. Basicranial flexion, relative brain size, and facial kyphosis in nonhuman primates. Am J Phys Anthro 91:305-324.
+
+- Singleton M. 2002. Patterns of cranial shape variation in the Papionini (Primates: Cercopithecinae). J Hum Evo 42:547-578.
+
 - Smith RJ, Jungers WL. 1997. Body mass in comparative primatology. J Hum Evol 32(6):523-559.
+
+- Taylor AB. 2002. Masticatory form and function in the African apes. Am J Phys Anthro 117:133-156.
 
 - Uyeda JC, Caetano DS, Pennell MW. 2015. Comparative analyses of principal components can be misleading. Syst Biol 64(4):677-89.
 
