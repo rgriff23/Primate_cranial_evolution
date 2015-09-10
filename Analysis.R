@@ -10,6 +10,7 @@ library(ape)
 library(geiger)
 library(caper)
 library(plyr)
+library(adephylo)
 
 # Load functions
 source("ProcD.pgls2.R")
@@ -22,11 +23,14 @@ skull = matrix(c(a,b), length(a), 2)
 
 # Set parameters for wireframe diagrams
 #pp <- par3d(no.readonly=TRUE)
-#dput(pp, file="dimorphismParamsF.R", control = "all")
-pam = dget("allometryParamsM.R")
-paf = dget("allometryParamsF.R")
-pdm = dget("dimorphismParamsM.R")
-pdf = dget("dimorphismParamsF.R")
+#dput(pp, file="figures/wireframe_params/modulesParams.R", control = "all")
+pam = dget("figures/wireframe_params/allometryParamsM.R")
+paf = dget("figures/wireframe_params/allometryParamsF.R")
+pdm = dget("figures/wireframe_params/dimorphismParamsM.R")
+pdf = dget("figures/wireframe_params/dimorphismParamsF.R")
+pdm2 = dget("figures/wireframe_params/dimorphism2ParamsM.R")
+pdf2 = dget("figures/wireframe_params/dimorphism2ParamsF.R")
+pm = dget("figures/wireframe_params/modulesParams.R")
 
 # Set seed since some significance tests are based on permutations
 set.seed(922015)
@@ -65,27 +69,26 @@ array.f = array(array.f, dim=c(18,3,61), dimnames=list(landmark.names, c("x", "y
 
 # View species and phylogeny
 quartz()
-colorcoding = ddply(landmarks, .(infraorder, superfamily, genus_species), function(x) {
-  infracol = 0
+colorcoding = ddply(landmarks, .(suborder, superfamily, genus_species), function(x) {
+  subcol = 0
   supercol = 0
-  if (x[1,"infraorder"] == "Lemuriformes") {infracol = "purple"}
-  if (x[1,"infraorder"] == "Tarsiiformes") {infracol = "blue"}
-  if (x[1,"infraorder"] == "Simiiformes") {infracol = "darkgreen"}
+  if (x[1,"suborder"] == "Strepsirrhini") {subcol = "purple"}
+  if (x[1,"suborder"] == "Haplorhini") {subcol = "darkgreen"}
   if (x[1,"superfamily"] == "Lorisoidea") {supercol = "black"}
   if (x[1,"superfamily"] == "Lemuroidea") {supercol = "purple"}
   if (x[1,"superfamily"] == "Tarsioidea") {supercol = "blue"}
   if (x[1,"superfamily"] == "Ceboidea") {supercol = "darkgreen"}
   if (x[1,"superfamily"] == "Cercopithecoidea") {supercol = "orange"}
   if (x[1,"superfamily"] == "Hominoidea") {supercol = "red"}
-  return(data.frame(infracol=infracol, supercol=supercol))
+  return(data.frame(subcol=subcol, supercol=supercol))
 })
-infracol.m = as.character(colorcoding$infracol[match(tree.m$tip.label, colorcoding$genus_species)])
+subcol.m = as.character(colorcoding$subcol[match(tree.m$tip.label, colorcoding$genus_species)])
 supercol.m = as.character(colorcoding$supercol[match(tree.m$tip.label, colorcoding$genus_species)])
 layout(matrix(1:2,1,2))
 par(mar=c(1,1,1,2))
-plot(tree.m, tip.color=infracol.m, cex=0.35, label.offset=0.5)
-mtext("Infraorders")
-legend("bottomleft", legend=c("Lemuriformes", "Tarsiiformes", "Simiiformes"), fill=c("purple", "blue", "darkgreen"), cex=0.4)
+plot(tree.m, tip.color=subcol.m, cex=0.35, label.offset=0.5)
+mtext("Suborders")
+legend("bottomleft", legend=c("Strepsirrhini", "Haplorhini"), fill=c("purple", "darkgreen"), cex=0.4)
 plot(tree.m, tip.color=supercol.m, cex=0.35, label.offset=0.5)
 mtext("Superfamilies")
 legend("bottomleft", legend=c("Lorisoidea", "Lemuroidea", "Tarsioidea", "Ceboidea", "Cercopithecoidea", "Hominoidea"), fill=c("black", "purple", "blue", "darkgreen", "orange", "red"), cex=0.4)
@@ -221,7 +224,7 @@ sqrt(vif.bm.sd.f)
 sexselect.m = procD.pgls(coords.m ~ dimorphism.m + log(csize.m), tree.m, RRPP=TRUE)
 sexselect.f = procD.pgls(coords.f ~ dimorphism.f + log(csize.f), tree.f, RRPP=TRUE)
 
-# Wireframes of dimorphism for males and females
+# Wireframes of dimorphism for males and females (controlling for centroid size)
 # males
 sexselect.m2 = procD.pgls2(coords.m ~ dimorphism.m + log(csize.m), tree.m)
 dimorph.model.m = coefficients(sexselect.m2$model)
@@ -251,64 +254,166 @@ array.min.dimorph.f = array(pred.min.dimorph.f, dim=c(18,3,1), dimnames=list(lan
 plotWireframe(array.max.dimorph.f, skull, params=pdf)
 plotWireframe(array.min.dimorph.f, skull, params=pdf)
 
-###############################################################################################
-# Sexual dimorphism and cranial shape divergence
-###############################################################################################
-
-# Compute dimorphism PIC ancestral states
-dimorphism.m.ace = ace(dimorphism.m, tree.m, method="pic")$ace
-dimorphism.f.ace = ace(dimorphism.f, tree.f, method="pic")$ace
-
-# Compute centroid size PICs
-csize.pic.m = pic(log(csize.m), tree.m)
-csize.pic.f = pic(log(csize.f), tree.f)
-
-# Compute sum of shape PICs
-mat.m = matrix(coords.m, dim(coords.m)[3], prod(dim(coords.m)[1:2]), byrow=TRUE, dimnames=list(dimnames(coords.m)[[3]]))
-mat.f = matrix(coords.f, dim(coords.f)[3], prod(dim(coords.f)[1:2]), byrow=TRUE, dimnames=list(dimnames(coords.f)[[3]]))
-shape.pic.m = c()
-shape.pic.f = c()
-for (i in 1:ncol(mat.m)) {
-  shape.pic.m = cbind(shape.pic.m, pic(mat.m[,i], tree.m))
-  shape.pic.f = cbind(shape.pic.f, pic(mat.f[,i], tree.f))
-  
+# Wireframes of allometry for males and females (controlling for dimorphism)
+# males
+pred.max.dimorph.m2 <- pred.min.dimorph.m2 <- c()
+for (i in 1:ncol(dimorph.model.m)) {
+  pred.max.dimorph.m2[i] = dimorph.model.m[1,i] + mean(dimorphism.m)*dimorph.model.m[2,i] + max.csize.m*dimorph.model.m[3,i]
+  pred.min.dimorph.m2[i] = dimorph.model.m[1,i] + mean(dimorphism.m)*dimorph.model.m[2,i] + min.csize.m*dimorph.model.m[3,i]
 }
-sum.pic.m = rowSums(abs(shape.pic.m))
-sum.pic.f = rowSums(abs(shape.pic.f))
-
-# Regress shape disparity vs. dimorphism and centroid size
-dimorphism.lm.m = lm(log(sum.pic.m) ~ dimorphism.m.ace + csize.pic.m)
-dimorphism.lm.f = lm(log(sum.pic.f) ~ dimorphism.f.ace + csize.pic.f)
-summary(dimorphism.lm.m)$coef
-summary(dimorphism.lm.f)$coef
-
-# Visualize results with scatterplots
-quartz()
-layout(matrix(1:2, 1, 2))
-pch.m = c(rep(1, 44), rep(3, 19))
-pch.f = c(rep(1, 43), rep(3, 17))
-plot(log(sum.pic.m) ~ dimorphism.m.ace, ylab="Cranial shape divergence", xlab="Sexual size dimorphism", main="Males", pch=pch.m)
-abline(a=summary(dimorphism.lm.m)$coef[1,"Estimate"], b=summary(dimorphism.lm.m)$coef[2,"Estimate"])
-par(xpd=TRUE)
-legend("topleft", inset=c(-0.2, -0.2), legend=c("Haplorhines", "Strepsirrhines"), pch=c(1,3), cex=0.6)
-par(xpd=FALSE)
-plot(log(sum.pic.f) ~ dimorphism.f.ace, ylab="", xlab="Sexual size dimorphism", main="Females", pch=pch.f)
-abline(a=summary(dimorphism.lm.f)$coef[1,"Estimate"], b=summary(dimorphism.lm.f)$coef[2,"Estimate"])
-
-# Visualize magnitude of cranial shape changes across phylogeny based on PIC
-quartz()
-layout(matrix(1:2,1,2))
-par(mar=c(0,0,2,0))
-plot(tree.m, cex=0.5)
-nodelabels(pch=22, cex=sum.pic.m*4, col="blue")
-mtext("Males")
-plot(tree.f, cex=0.5)
-nodelabels(pch=22, cex=sum.pic.f*4, col="red", bg="pink")
-mtext("Females")
+array.max.dimorph.m2 = array(pred.max.dimorph.m2, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+array.min.dimorph.m2 = array(pred.min.dimorph.m2, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+plotWireframe(array.max.dimorph.m2, skull, params=pdm2)
+plotWireframe(array.min.dimorph.m2, skull, params=pdm2)
+# females
+pred.max.dimorph.f2 <- pred.min.dimorph.f2 <- c()
+for (i in 1:ncol(dimorph.model.f)) {
+  pred.max.dimorph.f2[i] = dimorph.model.f[1,i] + mean(dimorphism.f)*dimorph.model.f[2,i] + max.csize.f*dimorph.model.f[3,i]
+  pred.min.dimorph.f2[i] = dimorph.model.f[1,i] + mean(dimorphism.f)*dimorph.model.f[2,i] + min.csize.f*dimorph.model.f[3,i]
+}
+array.max.dimorph.f2 = array(pred.max.dimorph.f2, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+array.min.dimorph.f2 = array(pred.min.dimorph.f2, dim=c(18,3,1), dimnames=list(landmark.names, c("x", "y", "z")))
+plotWireframe(array.max.dimorph.f2, skull, params=pdf2)
+plotWireframe(array.min.dimorph.f2, skull, params=pdf2)
 
 ###############################################################################################
 # Modularity, integration, and rates of cranial shape evolution
 ###############################################################################################
+
+# Define neurocranium and facial modules
+face.names = c("Rhinion", "Nasion", "Medial orbit border", "Lateral orbit border", "Orbitale superior", "Orbitale inferior", "Zygion", "Ectomolare", "Prosthion", "Alveolon")
+neuro.names = c("Bregma", "Pterion", "Euryon", "Lambda", "Inion", "Opisthion", "Basion", "Sphenobasion")
+face.m = coords.m[face.names,,]
+neuro.m = coords.m[neuro.names,,]
+face.f = coords.f[face.names,,]
+neuro.f = coords.f[neuro.names,,]
+partition = c("F", "F", "N", "F", "F", "F", "F", "N", "F", "F", "N", "F", "N", "N", "N", "N", "N", "F")
+
+# Plot wireframe with color coded modules
+open3d()
+par3d(pm)
+rgl.bg(sphere=TRUE, color=c("white"), lit=FALSE, back="fill")
+A = coords.m[,,"Cebus_apella"]
+Af = coords.m[face.names,,"Cebus_apella"]
+An = coords.m[neuro.names,,"Cebus_apella"]
+A3d = matrix(A, dim(A)[[1]], dim(A)[[2]], dimnames=dimnames(A)[1:2])
+plot3d(A3d, type = "n", col = "red", xlab = "", ylab = "", zlab = "", size = 1, aspect = FALSE, box=FALSE, axes=FALSE)
+points3d(Af, color = "red", size = 5)
+points3d(An, color = "blue", size = 5)
+for (i in 1:nrow(skull)) {segments3d(rbind(A[skull[i,1],], A[skull[i,2],]), lwd = 2, col="black")}
+
+# Define function to compute independent contrasts
+pic.shape = function (data, tree) {
+  num_landmarks = length(dimnames(data)[[1]])
+  num_dimensions = length(dimnames(data)[[2]])
+  num_species = length(dimnames(data)[[3]])
+  new_array = array(rep(0,length(data)), dim=c(num_landmarks, num_dimensions, num_species-1))
+  for (i in 1:num_landmarks) {for (ii in 1:num_dimensions) {new_array[i,ii,] = pic(data[i,ii,], tree)}}
+  dimnames(new_array) = list(dimnames(data)[[1]], dimnames(data)[[2]], names(pic(data[1,1,], tree)))
+  return(new_array)
+}
+
+# Test for modularity
+pic.coords.m = pic.shape(coords.m, tree.m)
+pic.coords.f = pic.shape(coords.f, tree.f)
+compare.modular.partitions(pic.coords.m, partition)# p = 0.005, rv=0.58
+compare.modular.partitions(pic.coords.f, partition)# p=0.002, rv=0.47
+
+# Test for integration
+morphol.integr(pic.coords.m[face.names,,], pic.coords.m[neuro.names,,], method="RV")# p=0.001
+morphol.integr(pic.coords.f[face.names,,], pic.coords.f[neuro.names,,], method="RV")# p=0.001
+
+# Test for differences in integration/modularity between strepsirrhines and haplorhines
+streps.m = coords.m[,,unique(landmarks.m$genus_species[which(landmarks.m$suborder == "Strepsirrhini")])]
+streps.m = gpagen(streps.m, ShowPlot = FALSE)
+streps.m = array(streps.m$coords, dim=dim(streps.m$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(streps.m$coords)[[3]]))
+streps.f = coords.f[,,unique(landmarks.f$genus_species[which(landmarks.f$infraorder == "Strepsirrhini")])]
+streps.f = gpagen(streps.f, ShowPlot = FALSE)
+streps.f = array(streps.f$coords, dim=dim(streps.f$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(streps.f$coords)[[3]]))
+haps.m = coords.m[,,unique(landmarks.m$genus_species[which(landmarks.m$infraorder == "Haplorhini")])]
+haps.m = gpagen(haps.m, ShowPlot = FALSE)
+haps.m = array(haps.m$coords, dim=dim(haps.m$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(haps.m$coords)[[3]]))
+haps.f = coords.f[,,unique(landmarks.f$genus_species[which(landmarks.f$infraorder == "Haplorhini")])]
+haps.f = gpagen(haps.f, ShowPlot = FALSE)
+haps.f = array(haps.f$coords, dim=dim(haps.f$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(haps.f$coords)[[3]]))
+tree.strep.m = drop.tip(tree.m, setdiff(tree.m$tip.label, dimnames(streps.m)[[3]]))
+tree.strep.f = drop.tip(tree.f, setdiff(tree.f$tip.label, dimnames(streps.f)[[3]]))
+tree.haps.m = drop.tip(tree.m, setdiff(tree.m$tip.label, dimnames(haps.m)[[3]]))
+tree.haps.f = drop.tip(tree.f, setdiff(tree.f$tip.label, dimnames(haps.f)[[3]]))
+pic.streps.m = pic.shape(streps.m, tree.strep.m)
+pic.streps.f = pic.shape(streps.f, tree.strep.f)
+pic.haps.m = pic.shape(haps.m, tree.haps.m)
+pic.haps.f = pic.shape(haps.f, tree.haps.f)
+compare.modular.partitions(pic.streps.m, partition)#p=0.5, rv=0.66
+compare.modular.partitions(pic.haps.m, partition)#p=0.001, rv=0.6
+compare.modular.partitions(pic.streps.f, partition)#p=0.13, rv=0.65
+compare.modular.partitions(pic.haps.f, partition)#p=0.001, rv=0.5
+morphol.integr(pic.streps.m[neuro.names,,], pic.streps.m[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.haps.m[neuro.names,,], pic.haps.m[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.streps.f[neuro.names,,], pic.streps.f[face.names,,], method="RV")#p=0.002
+morphol.integr(pic.haps.f[neuro.names,,], pic.haps.f[face.names,,], method="RV")#p=0.001
+
+# Test for different rates of evolution in strepsirrhines and haplorhines
+factors.m = factor(unique(landmarks.m[,c("genus_species", "suborder")])[,2])
+factors.f = factor(unique(landmarks.f[,c("genus_species", "suborder")])[,2])
+names(factors.m) = unique(landmarks.m$genus_species)
+names(factors.f) = unique(landmarks.f$genus_species)
+rates.m = compare.evol.rates(tree.m, coords.m, factors.m, ShowPlot=FALSE)#p=0.001
+2.286179e-05/8.129630e-06 
+rates.f = compare.evol.rates(tree.f, coords.f, factors.f, ShowPlot=FALSE)#p=0.001
+1.645051e-05/8.085462e-06 
+
+# Test for differences in integration/modularity between catarrhini and platyrrhini
+cats.m = coords.m[,,unique(landmarks.m$genus_species[which(landmarks.m$superfamily %in% c("Cercopithecoidea", "Hominoidea"))])]
+cats.m = gpagen(cats.m, ShowPlot = FALSE)
+cats.m = array(cats.m$coords, dim=dim(cats.m$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(cats.m$coords)[[3]]))
+cats.f = coords.f[,,unique(landmarks.f$genus_species[which(landmarks.f$superfamily %in% c("Cercopithecoidea", "Hominoidea"))])]
+cats.f = gpagen(cats.f, ShowPlot = FALSE)
+cats.f = array(cats.f$coords, dim=dim(cats.f$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(cats.f$coords)[[3]]))
+plats.m = coords.m[,,unique(landmarks.m$genus_species[which(landmarks.m$superfamily == "Ceboidea")])]
+plats.m = gpagen(plats.m, ShowPlot = FALSE)
+plats.m = array(plats.m$coords, dim=dim(plats.m$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(plats.m$coords)[[3]]))
+plats.f = coords.f[,,unique(landmarks.f$genus_species[which(landmarks.f$superfamily == "Ceboidea")])]
+plats.f = gpagen(plats.f, ShowPlot = FALSE)
+plats.f = array(plats.f$coords, dim=dim(plats.f$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(plats.f$coords)[[3]]))
+tree.cats.m = drop.tip(tree.m, setdiff(tree.m$tip.label, dimnames(cats.m)[[3]]))
+tree.cats.f = drop.tip(tree.f, setdiff(tree.f$tip.label, dimnames(cats.f)[[3]]))
+tree.plats.m = drop.tip(tree.m, setdiff(tree.m$tip.label, dimnames(plats.m)[[3]]))
+tree.plats.f = drop.tip(tree.f, setdiff(tree.f$tip.label, dimnames(plats.f)[[3]]))
+pic.cats.m = pic.shape(cats.m, tree.cats.m)
+pic.cats.f = pic.shape(cats.f, tree.cats.f)
+pic.plats.m = pic.shape(plats.m, tree.plats.m)
+pic.plats.f = pic.shape(plats.f, tree.plats.f)
+compare.modular.partitions(pic.cats.m, partition)#p=0.001, rv=0.64
+compare.modular.partitions(pic.cats.f, partition)#p=0.001, rv=0.53
+compare.modular.partitions(pic.plats.m, partition)#p=0.586, rv=0.77
+compare.modular.partitions(pic.plats.f, partition)#p=0.012, rv=0.54
+morphol.integr(pic.cats.m[neuro.names,,], pic.cats.m[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.plats.m[neuro.names,,], pic.plats.m[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.cats.f[neuro.names,,], pic.cats.f[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.plats.f[neuro.names,,], pic.plats.f[face.names,,], method="RV")#p=0.017
+
+# Test for different rates of evolution in catarrhini and platyrrhini
+tree.anth.m = drop.tip(tree.m, setdiff(tree.m$tip.label, c(dimnames(cats.m)[[3]], dimnames(plats.m)[[3]])))
+tree.anth.f = drop.tip(tree.f, setdiff(tree.f$tip.label, c(dimnames(cats.f)[[3]], dimnames(plats.f)[[3]])))
+coords.anth.m = coords.m[,,unique(landmarks.m$genus_species[which(landmarks.m$superfamily %in% c("Cercopithecoidea", "Hominoidea", "Ceboidea"))])]
+coords.anth.f = coords.f[,,unique(landmarks.f$genus_species[which(landmarks.f$superfamily %in% c("Cercopithecoidea", "Hominoidea", "Ceboidea"))])]
+factors.anth.m = unique(landmarks.m[which(landmarks.m$superfamily %in% c("Cercopithecoidea", "Hominoidea", "Ceboidea")),c("genus_species", "superfamily")])[,2]
+factors.anth.m[which(factors.anth.m  %in% c("Cercopithecoidea", "Hominoidea"))] = "Catarrhini"
+factors.anth.m[which(factors.anth.m  == "Ceboidea")] = "Platyrrhini"
+factors.anth.m = factor(factors.anth.m)
+names(factors.anth.m) = unique(landmarks.m[which(landmarks.m$superfamily %in% c("Cercopithecoidea", "Hominoidea", "Ceboidea")),c("genus_species", "superfamily")])[,1]
+factors.anth.f = unique(landmarks.f[which(landmarks.f$superfamily %in% c("Cercopithecoidea", "Hominoidea", "Ceboidea")),c("genus_species", "superfamily")])[,2]
+factors.anth.f[which(factors.anth.f  %in% c("Cercopithecoidea", "Hominoidea"))] = "Catarrhini"
+factors.anth.f[which(factors.anth.f  == "Ceboidea")] = "Platyrrhini"
+factors.anth.f = factor(factors.anth.f)
+names(factors.anth.f) = unique(landmarks.f[which(landmarks.f$superfamily %in% c("Cercopithecoidea", "Hominoidea", "Ceboidea")),c("genus_species", "superfamily")])[,1]
+rates.anth.m = compare.evol.rates(tree.anth.m, coords.anth.m, factors.anth.m, ShowPlot=FALSE)#p=0.026
+2.65970e-05/1.63861e-05 
+rates.anth.f = compare.evol.rates(tree.anth.f, coords.anth.f, factors.anth.f, ShowPlot=FALSE)#p=0.015
+1.898842e-05/1.234976e-05
+
+
 
 
 

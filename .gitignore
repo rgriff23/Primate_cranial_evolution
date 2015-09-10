@@ -12,3 +12,6 @@ CranialData.csv
 # ignore wireframe originals and params
 figures/wireframe_originals
 figures/wireframe_params
+
+# ignore unused R code
+Unused.R
