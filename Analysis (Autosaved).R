@@ -312,6 +312,14 @@ face.f = coords.f[face.names,,]
 neuro.f = coords.f[neuro.names,,]
 partition = c("F", "F", "N", "F", "F", "F", "F", "N", "F", "F", "N", "F", "N", "N", "N", "N", "N", "F")
 
+# Define taxonomic groups to compare
+suborder.m = dimnames(A)[[3]]
+suborder.m[c(1,2,44:63)] = "Prosimian"
+suborder.m[3:43] = "Anthropoid"
+cats = dimnames(A)[[3]]
+cats[1:length(groups2)] = "NonCat"
+cats[4:30] = "Cat"
+
 # Plot wireframe with color coded modules
 open3d()
 par3d(pm)
@@ -352,7 +360,7 @@ morphol.integr(pic.coords.f[face.names,,], pic.coords.f[neuro.names,,], method="
 morphol.integr(pic.resid.m[face.names,,], pic.resid.m[neuro.names,,], method="RV")# p=0.001
 morphol.integr(pic.resid.f[face.names,,], pic.resid.f[neuro.names,,], method="RV")# p=0.001
 
-# Test for differences in integration/modularity between strepsirrhines and haplorhines
+# Test for differences in integration/modularity between strepsirrhines and haplorhines (raw coords)
 streps.m = coords.m[,,unique(landmarks.m$genus_species[which(landmarks.m$suborder == "Strepsirrhini")])]
 streps.m = gpagen(streps.m, ShowPlot = FALSE)
 streps.m = array(streps.m$coords, dim=dim(streps.m$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(streps.m$coords)[[3]]))
@@ -377,6 +385,34 @@ compare.modular.partitions(pic.streps.m, partition)#p=0.5, rv=0.66
 compare.modular.partitions(pic.haps.m, partition)#p=0.001, rv=0.6
 compare.modular.partitions(pic.streps.f, partition)#p=0.13, rv=0.65
 compare.modular.partitions(pic.haps.f, partition)#p=0.001, rv=0.5
+morphol.integr(pic.streps.m[neuro.names,,], pic.streps.m[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.haps.m[neuro.names,,], pic.haps.m[face.names,,], method="RV")#p=0.001
+morphol.integr(pic.streps.f[neuro.names,,], pic.streps.f[face.names,,], method="RV")#p=0.002
+morphol.integr(pic.haps.f[neuro.names,,], pic.haps.f[face.names,,], method="RV")#p=0.001
+
+# Test for differences in integration/modularity between strepsirrhines and haplorhines (size controlled)
+streps.m2 = resid.m[,,unique(landmarks.m$genus_species[which(landmarks.m$suborder == "Strepsirrhini")])]
+streps.m2 = gpagen(streps.m2, ShowPlot = FALSE)
+streps.m2 = array(streps.m2$coords, dim=dim(streps.m2$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(streps.m2$coords)[[3]]))
+streps.f2 = resid.f[,,unique(landmarks.f$genus_species[which(landmarks.f$suborder == "Strepsirrhini")])]
+streps.f2 = gpagen(streps.f2, ShowPlot = FALSE)
+streps.f2 = array(streps.f2$coords, dim=dim(streps.f2$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(streps.f2$coords)[[3]]))
+haps.m2 = resid.m[,,unique(landmarks.m$genus_species[which(landmarks.m$suborder == "Haplorhini")])]
+haps.m2 = gpagen(haps.m2, ShowPlot = FALSE)
+haps.m2 = array(haps.m2$coords, dim=dim(haps.m2$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(haps.m2$coords)[[3]]))
+haps.f2 = resid.f[,,unique(landmarks.f$genus_species[which(landmarks.f$suborder == "Haplorhini")])]
+haps.f2 = gpagen(haps.f2, ShowPlot = FALSE)
+haps.f2 = array(haps.f2$coords, dim=dim(haps.f2$coords), dimnames=list(landmark.names, c("x", "y", "z"), dimnames(haps.f2$coords)[[3]]))
+pic.streps.m2 = pic.shape(streps.m2, tree.strep.m)
+pic.streps.f2 = pic.shape(streps.f2, tree.strep.f)
+pic.haps.m2 = pic.shape(haps.m2, tree.haps.m)
+pic.haps.f2 = pic.shape(haps.f2, tree.haps.f)
+compare.modular.partitions(pic.streps.m2, partition)#p=0.45, rv=0.62
+compare.modular.partitions(pic.haps.m2, partition)#p=0.001, rv=0.47
+compare.modular.partitions(pic.streps.f2, partition)#p=0.24, rv=0.65
+compare.modular.partitions(pic.haps.f2, partition)#p=0.002, rv=0.51
+# significant difference between groups?
+compare.modular.groups(pic.resid.m, partition, suborder.m, ShowPlot=TRUE)
 morphol.integr(pic.streps.m[neuro.names,,], pic.streps.m[face.names,,], method="RV")#p=0.001
 morphol.integr(pic.haps.m[neuro.names,,], pic.haps.m[face.names,,], method="RV")#p=0.001
 morphol.integr(pic.streps.f[neuro.names,,], pic.streps.f[face.names,,], method="RV")#p=0.002

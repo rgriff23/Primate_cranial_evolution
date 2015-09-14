@@ -1,3 +1,6 @@
+---
+output: html_document
+---
 # Primate cranial shape evolution: Combining geometric morphometrics and phylogenetic comparative methods
 
 [Randi H. Griffin]()
